@@ -67,7 +67,7 @@ Release builds are not code-signed unless the maintainer has configured signing 
 | Browser (MSAL) | Opens your default browser (with its current profile) to sign in. Use it when Conditional Access requires a compliant device or managed browser.    |
 | Azure CLI      | Uses the account you are signed in to with `az login`. Requires the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) on `PATH`. |
 
-By default, browser sign-in uses the Azure CLI's public client ID, so no app registration is needed. To use your own Entra app registration, set the `AZURE_CLIENT_ID` environment variable (a public client with `http://localhost` as a redirect URI). Set `AZURE_TENANT_ID` to pre-select a directory.
+By default, browser sign-in uses the Azure CLI's public client ID, so no app registration is needed. To use your own Entra app registration, set the `EZAZFW_CLIENT_ID` environment variable (a public client with `http://localhost` as a redirect URI). Set `EZAZFW_TENANT_ID` to pre-select a directory. The app deliberately ignores `AZURE_CLIENT_ID` and `AZURE_TENANT_ID`, which other tools often set for their own app registrations.
 
 The app only requests the Azure Resource Manager scope (`https://management.azure.com/.default`); it can do nothing your account cannot already do in Azure.
 

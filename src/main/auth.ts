@@ -38,7 +38,8 @@ const SIGNED_OUT = 'You are signed out. Sign in to Azure to continue.';
 // can sign in without an app registration or admin consent in their directory. This is a
 // deliberate trade-off: tokens for this ID can be exchanged for other Microsoft first-party APIs,
 // so the refresh token is only ever stored encrypted (tokenCache.ts) and never leaves this
-// process. A publisher with its own Entra app registration can set AZURE_CLIENT_ID instead.
+// process. A publisher with its own Entra app registration can set EZAZFW_CLIENT_ID instead.
+// (Not AZURE_CLIENT_ID: other tools set that for their own app registrations or service principals.)
 const DEFAULT_CLIENT_ID = '04b07795-8ddb-461a-bbee-02f9e1bf7b46';
 
 const TENANT =
@@ -89,7 +90,7 @@ function createPca(): PublicClientApplication {
   cachePlugin = new EncryptedCachePlugin();
   return new PublicClientApplication({
     auth: {
-      clientId: process.env.AZURE_CLIENT_ID || DEFAULT_CLIENT_ID,
+      clientId: process.env.EZAZFW_CLIENT_ID || DEFAULT_CLIENT_ID,
       authority: `${LOGIN}/organizations`,
     },
     cache: { cachePlugin },
@@ -485,7 +486,7 @@ export async function signIn(
   // A new sign-in replaces any saved one (and its tokens).
   await forgetSession();
   method = signInMethod;
-  const requested = tenantId || process.env.AZURE_TENANT_ID || undefined;
+  const requested = tenantId || process.env.EZAZFW_TENANT_ID || undefined;
   const specific =
     requested && !GENERIC_AUTHORITIES.includes(requested.toLowerCase())
       ? requested

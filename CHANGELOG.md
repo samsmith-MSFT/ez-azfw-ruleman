@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-30
+
+### Fixed
+
+- Sign-in failed with AADSTS650057 when another tool had set `AZURE_CLIENT_ID`. The app now reads its own `EZAZFW_CLIENT_ID` and `EZAZFW_TENANT_ID` variables instead of `AZURE_CLIENT_ID` and `AZURE_TENANT_ID`.
+
 ## [1.1.0] - 2026-10-30
 
 ### Changed
@@ -30,6 +36,7 @@ Initial public release.
 - Encrypted, OS key store–backed token cache.
 - Portable, no-install executables for Windows (x64 and Arm64 `.exe`), macOS (zipped `.app`, arm64 and x64), and Linux (x64 AppImage).
 
-[Unreleased]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases/tag/v1.0.0
