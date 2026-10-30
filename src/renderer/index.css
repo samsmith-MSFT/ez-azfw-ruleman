@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-900 font-sans text-sm text-fg antialiased;
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-azure/40;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.azure.DEFAULT');
+    outline-offset: 1px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.ink.700') transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Frameless window: the title bar drags the window, its controls do not. */
+  .drag {
+    -webkit-app-region: drag;
+  }
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+
+  .btn {
+    @apply inline-flex h-8 items-center gap-1.5 rounded px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply btn bg-azure text-ink-950 hover:bg-azure-hover;
+  }
+  .btn-candidate {
+    @apply btn bg-candidate text-candidate-ink hover:bg-candidate-hover;
+  }
+  .btn-ghost {
+    @apply btn text-fg-muted hover:bg-ink-800 hover:text-fg;
+  }
+  .btn-outline {
+    @apply btn border border-line text-fg hover:border-fg-faint hover:bg-ink-800;
+  }
+  .btn-danger {
+    @apply btn bg-deny text-white hover:brightness-110;
+  }
+
+  .input {
+    @apply h-8 w-full rounded border border-line bg-ink-950 px-2.5 text-sm text-fg placeholder:text-fg-faint focus:border-azure focus:outline-none;
+  }
+  textarea.input {
+    @apply h-auto py-1.5;
+  }
+
+  .label {
+    @apply mb-1 block text-xs font-medium text-fg-muted;
+  }
+
+  /* Network values (IPs, CIDRs, ports, FQDNs) use the mono face for character disambiguation. */
+  .netval {
+    @apply font-mono text-[12.5px] text-fg;
+  }
+}

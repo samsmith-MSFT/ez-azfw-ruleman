@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="512" height="512">
+  <!-- Keep in sync with src/renderer/components/Logo.tsx. Regenerate icons with `npm run icons`. -->
+  <defs>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#50E6FF"/>
+      <stop offset="100%" stop-color="#0078D4"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB900"/>
+      <stop offset="100%" stop-color="#F25022"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <path d="M32 4 L55 12 V33 C55 46 45 56 32 60 C19 56 9 46 9 33 V12 Z" transform="translate(32 32) scale(0.82) translate(-32 -32)"/>
+    </clipPath>
+  </defs>
+  <path d="M32 4 L55 12 V33 C55 46 45 56 32 60 C19 56 9 46 9 33 V12 Z" fill="url(#shield)"/>
+  <g fill="#FFFFFF" fill-opacity="0.9" clip-path="url(#clip)">
+    <rect x="4" y="24" width="8.5" height="6" rx="1"/><rect x="14" y="24" width="8.5" height="6" rx="1"/><rect x="24" y="24" width="8.5" height="6" rx="1"/><rect x="34" y="24" width="8.5" height="6" rx="1"/><rect x="44" y="24" width="8.5" height="6" rx="1"/><rect x="54" y="24" width="8.5" height="6" rx="1"/>
+    <rect x="9" y="32" width="8.5" height="6" rx="1"/><rect x="19" y="32" width="8.5" height="6" rx="1"/><rect x="29" y="32" width="8.5" height="6" rx="1"/><rect x="39" y="32" width="8.5" height="6" rx="1"/><rect x="49" y="32" width="8.5" height="6" rx="1"/><rect x="59" y="32" width="8.5" height="6" rx="1"/>
+    <rect x="4" y="40" width="8.5" height="6" rx="1"/><rect x="14" y="40" width="8.5" height="6" rx="1"/><rect x="24" y="40" width="8.5" height="6" rx="1"/><rect x="34" y="40" width="8.5" height="6" rx="1"/><rect x="44" y="40" width="8.5" height="6" rx="1"/><rect x="54" y="40" width="8.5" height="6" rx="1"/>
+  </g>
+  <path d="M32 7 C36 11 38 14 37 18 C36.5 20.5 34.5 22 32 22 C29.5 22 27.5 20.5 27 18 C26.5 15.5 28 13.5 29.5 12 C29.5 14 30.5 15.5 32 16 C31 13 31 10 32 7 Z" fill="url(#flame)"/>
+</svg>

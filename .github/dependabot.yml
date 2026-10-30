@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      electron-forge:
+        patterns: ['@electron-forge/*', '@electron/*']
+      azure-sdk:
+        patterns: ['@azure/*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
