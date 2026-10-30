@@ -4,8 +4,11 @@ A cross-platform desktop app for managing [Azure Firewall](https://learn.microso
 
 Instead of editing rules live in the Azure portal, you stage changes locally as a _candidate_, review the risk and the exact diff, and then commit them to Azure in one step — with a local history of every commit.
 
+[![Latest release](https://img.shields.io/github/v/release/samsmith-MSFT/ez-azfw-ruleman?label=download&sort=semver)](https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases/latest)
 [![CI](https://github.com/samsmith-MSFT/ez-azfw-ruleman/actions/workflows/ci.yml/badge.svg)](https://github.com/samsmith-MSFT/ez-azfw-ruleman/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+**[⬇ Download the latest version](https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases/latest)** for Windows, macOS or Linux. Nothing to install: download it and run it.
 
 ## Features
 
@@ -21,7 +24,7 @@ Instead of editing rules live in the Azure portal, you stage changes locally as 
 
 ## Download and run
 
-Download the file for your platform from the [Releases page](https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases). Every build is portable: there is nothing to install. Just download it and run it.
+Download the file for your platform from the [latest release](https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases/latest). Every build is portable: there is nothing to install. Just download it and run it.
 
 | Platform              | File                                              | How to run                                    |
 | --------------------- | ------------------------------------------------- | --------------------------------------------- |
@@ -138,12 +141,11 @@ vite.*.config.mts    Vite build configuration for main, preload, and renderer
 
 ## Releasing
 
-1. Update `CHANGELOG.md` and bump the version: `npm version <major|minor|patch> --no-git-tag-version`.
+1. Add a `## [1.2.3] - YYYY-MM-DD` section to `CHANGELOG.md` and bump the version: `npm version <major|minor|patch> --no-git-tag-version`.
 2. Commit, then tag and push: `git tag v1.2.3 && git push origin main v1.2.3`.
-3. The [Release workflow](.github/workflows/release.yml) builds portable executables for Windows (x64 and Arm64), macOS (arm64 and x64) and Linux (x64), and uploads them to a **draft** GitHub release.
-4. Review the draft release notes and assets, then publish the release.
+3. The [Release workflow](.github/workflows/release.yml) builds portable executables for Windows (x64 and Arm64), macOS (arm64 and x64) and Linux (x64) into a draft release. Once **every** build succeeds, it adds `SHA256SUMS.txt`, writes the release notes (a download table plus that version's CHANGELOG section, from [`.github/release-notes.md`](.github/release-notes.md)), and publishes the release as **Latest**.
 
-The tag must match the `version` in `package.json`.
+The tag must match the `version` in `package.json`. If a build fails, the release stays a draft. Fix the problem, then re-run the failed jobs (or run the workflow manually with the tag).
 
 ### Code signing (optional)
 
