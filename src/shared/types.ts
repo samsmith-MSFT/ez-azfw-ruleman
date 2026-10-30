@@ -1,6 +1,7 @@
 // Plain, IPC-serializable types shared by the main process, preload and renderer.
 
-export type AuthMethod = 'browser' | 'cli';
+/** 'window': app sign-in window; 'browser': system browser; 'cli': Azure CLI. */
+export type AuthMethod = 'window' | 'browser' | 'cli';
 
 export type TenantStatus = 'ready' | 'needs-sign-in' | 'unavailable';
 

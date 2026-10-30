@@ -46,7 +46,7 @@ export interface ActiveCommit {
 
 export interface SavedSession {
   method: AuthMethod;
-  /** MSAL account ID for browser sign-in. */
+  /** MSAL account ID for window or browser sign-in. */
   homeAccountId?: string;
   /** Directory requested explicitly at sign-in, if any. */
   tenantId?: string;

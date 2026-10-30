@@ -43,9 +43,11 @@ export function SignIn({
           <div className="mt-8 flex items-center gap-4">
             <Spinner
               label={
-                busy === 'browser'
-                  ? 'Finish signing in in your browser…'
-                  : 'Checking your Azure CLI sign-in…'
+                busy === 'window'
+                  ? 'Finish signing in in the sign-in window…'
+                  : busy === 'browser'
+                    ? 'Finish signing in in your browser…'
+                    : 'Checking your Azure CLI sign-in…'
               }
             />
             <button
@@ -63,7 +65,7 @@ export function SignIn({
           <div className="mt-8 flex flex-col gap-2">
             <button
               className="btn-primary h-10 justify-center text-base"
-              onClick={() => signIn('browser')}
+              onClick={() => signIn('window')}
             >
               Sign in with a Microsoft account
             </button>
@@ -72,6 +74,12 @@ export function SignIn({
               onClick={() => signIn('cli')}
             >
               Use my Azure CLI sign-in
+            </button>
+            <button
+              className="btn-ghost h-9 justify-center text-sm"
+              onClick={() => signIn('browser')}
+            >
+              Sign in with my default browser instead
             </button>
           </div>
         )}

@@ -1,4 +1,4 @@
-import { shell } from 'electron';
+import { app, BrowserWindow, session, shell } from 'electron';
 import {
   InteractionRequiredAuthError,
   PublicClientApplication,
@@ -44,6 +44,8 @@ const DEFAULT_CLIENT_ID = '04b07795-8ddb-461a-bbee-02f9e1bf7b46';
 const TENANT =
   /^([0-9a-f-]{36}|[a-z0-9-]+(\.[a-z0-9-]+)+|organizations|common)$/i;
 const GENERIC_AUTHORITIES = ['organizations', 'common'];
+/** Own browser session for the sign-in window, kept apart from the app's pages. */
+const SIGN_IN_PARTITION = 'persist:signin';
 
 const PAGE = (title: string, body: string) =>
   `<!doctype html><meta charset="utf-8"><title>EZ AzFW Rule Manager</title><body style="font-family:Segoe UI,system-ui,sans-serif;background:#0F1B2D;color:#E4EAF3;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div><h1 style="font-size:22px;margin:0 0 8px">${title}</h1><p style="color:#93A4BD;margin:0">${body}</p></div></body>`;
@@ -79,6 +81,7 @@ let generation = 0;
 /** Pending token-cache writes of the last closed sign-in; the cache file is deleted after them. */
 let closingCache: Promise<void> = Promise.resolve();
 const resetListeners = new Set<() => void>();
+let signInWindow: BrowserWindow | null = null;
 
 const key = (tenantId: string) => tenantId.toLowerCase();
 
@@ -138,34 +141,118 @@ function abortable<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
   );
 }
 
+const isLoopback = (target: string): boolean => {
+  try {
+    const { protocol, hostname } = new URL(target);
+    return (
+      protocol === 'http:' &&
+      (hostname === 'localhost' || hostname === '127.0.0.1')
+    );
+  } catch {
+    return false;
+  }
+};
+
+function closeSignInWindow(): void {
+  const win = signInWindow;
+  signInWindow = null;
+  if (win && !win.isDestroyed()) win.close();
+}
+
+/**
+ * Shows Microsoft's sign-in page in an app window rather than the system browser, so the account
+ * picker appears instead of whichever browser profile happens to be the default. MSAL's localhost
+ * listener still receives the redirect; the window closes once it gets there. Closing the window
+ * early calls onCancel.
+ */
+function openSignInWindow(url: string, onCancel: () => void): void {
+  closeSignInWindow();
+  const ses = session.fromPartition(SIGN_IN_PARTITION);
+  ses.setPermissionRequestHandler((_wc, _permission, callback) =>
+    callback(false),
+  );
+  const win = new BrowserWindow({
+    parent: BrowserWindow.getFocusedWindow() ?? undefined,
+    width: 520,
+    height: 720,
+    minimizable: false,
+    autoHideMenuBar: true,
+    title: 'Sign in to Azure',
+    backgroundColor: '#FFFFFF',
+    webPreferences: {
+      session: ses,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      devTools: !app.isPackaged,
+    },
+  });
+  signInWindow = win;
+  let finished = false;
+
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  // Sign-in may pass through federated identity providers (any HTTPS site), then ends at MSAL's
+  // localhost listener. Nothing else may load here.
+  const guard = (event: Electron.Event, target: string) => {
+    if (!target.startsWith('https://') && !isLoopback(target))
+      event.preventDefault();
+  };
+  win.webContents.on('will-navigate', guard);
+  win.webContents.on('will-redirect', guard);
+  win.webContents.on('did-navigate', (_e, target) => {
+    if (!isLoopback(target)) return;
+    // MSAL's listener has the response now; there's nothing left to show.
+    finished = true;
+    win.close();
+  });
+  win.on('closed', () => {
+    if (signInWindow === win) signInWindow = null;
+    if (!finished) onCancel();
+  });
+  // Rejections here are aborted loads (redirects, window closed); the window shows real errors.
+  win.loadURL(url).catch(() => undefined);
+}
+
 async function interactive(
   authority: string,
   signal?: AbortSignal,
 ): Promise<AuthenticationResult> {
   if (!pca) throw new Error(SIGNED_OUT);
-  return abortable(
-    pca.acquireTokenInteractive({
-      scopes: ARM_SCOPES,
-      authority,
-      account: msalAccount ?? undefined,
-      loginHint: msalAccount?.username,
-      openBrowser: async (url) => {
-        // Only ever hand Microsoft sign-in URLs to the system browser.
-        if (!url.startsWith(`${LOGIN}/`))
-          throw new Error('Unexpected sign-in URL.');
-        await shell.openExternal(url);
-      },
-      successTemplate: PAGE(
-        'Signed in to EZ AzFW Rule Manager',
-        'You can close this tab and return to the app.',
-      ),
-      errorTemplate: PAGE(
-        "Sign-in didn't complete",
-        'Return to EZ AzFW Rule Manager and try again.',
-      ),
-    }),
-    signal,
-  );
+  const inWindow = method === 'window';
+  const closed = new AbortController();
+  const cancel = signal
+    ? AbortSignal.any([signal, closed.signal])
+    : closed.signal;
+  try {
+    return await abortable(
+      pca.acquireTokenInteractive({
+        scopes: ARM_SCOPES,
+        authority,
+        account: msalAccount ?? undefined,
+        loginHint: msalAccount?.username,
+        // First sign-in: always let the user pick (or add) the account to use.
+        prompt: msalAccount ? undefined : 'select_account',
+        openBrowser: async (url) => {
+          // Only ever open Microsoft sign-in URLs.
+          if (!url.startsWith(`${LOGIN}/`))
+            throw new Error('Unexpected sign-in URL.');
+          if (inWindow) openSignInWindow(url, () => closed.abort());
+          else await shell.openExternal(url);
+        },
+        successTemplate: PAGE(
+          'Signed in to EZ AzFW Rule Manager',
+          'You can close this tab and return to the app.',
+        ),
+        errorTemplate: PAGE(
+          "Sign-in didn't complete",
+          'Return to EZ AzFW Rule Manager and try again.',
+        ),
+      }),
+      cancel,
+    );
+  } finally {
+    if (inWindow) closeSignInWindow();
+  }
 }
 
 /**
@@ -464,10 +551,7 @@ export function restoreSession(): Promise<AccountInfo | null> {
 async function restore(): Promise<AccountInfo | null> {
   const saved: SavedSession | undefined = loadState().session;
   if (!saved) return null;
-  if (
-    saved.method === 'browser' &&
-    (!saved.homeAccountId || !canPersistTokens())
-  )
+  if (saved.method !== 'cli' && (!saved.homeAccountId || !canPersistTokens()))
     return null;
 
   pendingSignIn?.abort();
@@ -652,6 +736,13 @@ function clearState(): void {
 export async function signOut(): Promise<void> {
   pendingSignIn?.abort();
   await forgetSession();
+  // Also forget the accounts the sign-in window remembers.
+  await session
+    .fromPartition(SIGN_IN_PARTITION)
+    .clearStorageData()
+    .catch((err: Error) =>
+      console.warn('[auth] Clearing sign-in window data failed:', err.message),
+    );
   reset();
 }
 

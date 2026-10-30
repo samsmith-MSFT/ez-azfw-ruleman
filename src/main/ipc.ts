@@ -101,7 +101,7 @@ export function registerIpc(getContents: () => WebContents | undefined): void {
     if (contents && !contents.isDestroyed()) contents.send(channel, payload);
   };
   handle(IPC.signIn, (_e, method: unknown, tenantId: unknown) => {
-    if (method !== 'browser' && method !== 'cli')
+    if (method !== 'window' && method !== 'browser' && method !== 'cli')
       throw new Error('Unknown sign-in method.');
     if (tenantId !== undefined && typeof tenantId !== 'string')
       throw new Error('Invalid tenant.');

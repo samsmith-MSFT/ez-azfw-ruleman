@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-30
+
+### Changed
+
+- Microsoft account sign-in now opens in an app sign-in window with an account picker, instead of the default browser profile. Default-browser sign-in is still available.
+
 ## [1.0.0] - 2026-10-29
 
 Initial public release.
@@ -24,5 +30,6 @@ Initial public release.
 - Encrypted, OS key store–backed token cache.
 - Portable, no-install executables for Windows (x64 and Arm64 `.exe`), macOS (zipped `.app`, arm64 and x64), and Linux (x64 AppImage).
 
-[Unreleased]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/samsmith-MSFT/ez-azfw-ruleman/releases/tag/v1.0.0
